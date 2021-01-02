@@ -1,5 +1,5 @@
 import { Download } from './Download';
-import { Post } from './Post';
+import { Post } from '../Post';
 import pptr from 'puppeteer';
 
 export class Mediafire extends Download {

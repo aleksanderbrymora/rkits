@@ -1,7 +1,7 @@
 import chalk from 'chalk';
 import dl from 'download';
-import { Post } from './Post';
-import { logger } from './logger';
+import { Post } from '../Post';
+import { logger } from '../logger';
 
 export class Download {
   constructor(private readonly dlurl: string, private readonly post: Post) {}

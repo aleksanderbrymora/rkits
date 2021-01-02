@@ -1,4 +1,4 @@
-import { DriveType } from './driveType';
+import { DriveType } from './Drives/driveType';
 
 export class Post {
   onlineDrive: DriveType;
@@ -15,6 +15,7 @@ export class Post {
     if (url.includes('google')) return 'google';
     if (url.includes('dropbox')) return 'dropbox';
     if (url.includes('mediafire')) return 'mediafire';
+    if (url.includes('wetransfer')) return 'wetransfer';
     return 'nothing';
   }
 }

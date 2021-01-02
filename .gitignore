@@ -1,3 +1,4 @@
 node_modules/
 kits/
 dist/
+yarn-error.log
