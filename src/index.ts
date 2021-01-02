@@ -62,8 +62,13 @@ const main = async (): Promise<void> => {
 
 const dropbox = async (post: Post): Promise<void> => {
   logger('Starting the download of', post.title);
-  const link = post.url.replace('dl=0', 'dl=1');
-  await download(link, 'kits', {});
+  try {
+    const link = post.url.replace('dl=0', 'dl=1');
+    await download(link, 'kits');
+  } catch (error) {
+    console.error(error);
+    console.log(chalk.red(`${post.title} has failed to download`));
+  }
 };
 
 // const dropbox = async (browser: pptr.Browser, post: Post): Promise<void> => {
