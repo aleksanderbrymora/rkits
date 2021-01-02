@@ -9,12 +9,11 @@ export class Download {
   async download(path: string = 'kits'): Promise<void> {
     try {
       logger(
-        `Starting a download from ${this.post.onlineDrive} of`,
+        `Starting a download from ${this.post.onlineDrive} (url: ${this.dlurl}) of`,
         this.post.title,
       );
       await dl(this.dlurl, path, {
         extract: true,
-        // filename: this.post.title,
       });
       logger('Downloaded:', this.post.title);
     } catch (error) {

@@ -62,7 +62,7 @@ const createKitsFolder = async () => {
 const fetchFiles = async (posts: Post[]): Promise<void> => {
   await createKitsFolder();
   logger(`Starting to download the files`);
-  const { results, errors } = await Pool.withConcurrency(5)
+  const { results, errors } = await Pool.withConcurrency(2)
     .for(posts)
     .process((p) => downloadFromStorage(p));
 

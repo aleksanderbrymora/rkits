@@ -12,12 +12,16 @@ export const createMediafire = async (post: Post): Promise<Mediafire> => {
   const browser = await pptr.launch();
   const page = await browser.newPage();
   await page.goto(post.url);
-  await page.waitForNavigation({ waitUntil: 'networkidle0' });
+  await page.waitForSelector('button.fc-cta-consent');
   const link = await page.evaluate(() => {
+    const consent = document.querySelector<HTMLButtonElement>(
+      'button.fc-cta-consent',
+    );
+    console.log(consent);
+    consent?.click();
     const a = document.querySelector<HTMLLinkElement>('#downloadButton');
     return a!.href;
   });
-  console.log(`------ The link for mediafire download ${link}`);
   await browser.close();
   return new Mediafire(post, link);
 };
