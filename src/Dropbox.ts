@@ -1,21 +1,10 @@
-import { Post } from 'Post';
-import download from 'download';
-import chalk from 'chalk';
+import { Post } from './Post';
+import { Download } from './Download';
 
-export class Dropbox {
-  public readonly dlurl: string;
-  private post: Post;
+export class Dropbox extends Download {
   constructor(post: Post) {
-    this.dlurl = post.url.replace('dl=0', 'dl=1');
-    this.post = post;
-  }
-  async download(path: string = 'kits'): Promise<void> {
-    try {
-      await download(this.dlurl, path);
-    } catch (error) {
-      console.error(error);
-      console.log(chalk.red(`${this.post.title} has failed to download`));
-    }
+    const url = post.url.replace('dl=0', 'dl=1');
+    super(url, post);
   }
 }
 

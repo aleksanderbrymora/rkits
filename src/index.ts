@@ -1,17 +1,12 @@
 import Pool from '@supercharge/promise-pool';
 import axios from 'axios';
-import chalk from 'chalk';
-import download from 'download';
-import pptr from 'puppeteer';
-import { logger } from './logger';
-import { Post } from './Post';
+import fs from 'fs/promises';
+import path from 'path';
 import { Dropbox } from './Dropbox';
-
-export enum DriveType {
-  'google',
-  'mediafire',
-  'dropbox',
-}
+import { Google } from './Google';
+import { logger } from './logger';
+import { createMediafire } from './Mediafire';
+import { Post } from './Post';
 
 const main = async (): Promise<void> => {
   const { data } = await axios.get('https://www.reddit.com/r/drumkits.json');
@@ -35,22 +30,19 @@ const main = async (): Promise<void> => {
   await fetchFiles(posts);
 };
 
-
-const downloadFromStorage = async (
-  browser: pptr.Browser,
-  post: Post,
-): Promise<void> => {
-  logger(`Starting the download of`, post.title);
+const downloadFromStorage = async (post: Post): Promise<void> => {
   switch (post.onlineDrive) {
-    case DriveType.dropbox:
-      const d = new Dropbox(post);
-      await d.download();
+    case 'dropbox':
+      const dropbox = new Dropbox(post);
+      await dropbox.download();
       break;
-    case DriveType.google:
-      // await google(browser, post);
+    case 'google':
+      const google = new Google(post);
+      // await google.download();
       break;
-    case DriveType.mediafire:
-      // await mediafire(browser, post);
+    case 'mediafire':
+      const mediafire = await createMediafire(post);
+      await mediafire.download();
       break;
     default:
       logger('Unknown online drive');
@@ -58,13 +50,22 @@ const downloadFromStorage = async (
   }
 };
 
-const fetchFiles = async (posts: Post[]): Promise<void> => {
-  const browser = await pptr.launch({ devtools: true });
-  const { results, errors } = await Pool.withConcurrency(2)
-    .for(posts)
-    .process((p) => downloadFromStorage(browser, p));
+const createKitsFolder = async () => {
+  try {
+    await fs.mkdir(path.resolve('kits'));
+    console.log('Created the kits folder');
+  } catch (err) {
+    console.log('Kits folder already exists');
+  }
+};
 
-  await browser.close();
+const fetchFiles = async (posts: Post[]): Promise<void> => {
+  await createKitsFolder();
+  logger(`Starting to download the files`);
+  const { results, errors } = await Pool.withConcurrency(5)
+    .for(posts)
+    .process((p) => downloadFromStorage(p));
+
   logger('All done');
 };
 

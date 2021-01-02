@@ -1,7 +1,7 @@
-import { DriveType } from './index';
+import { DriveType } from './driveType';
 
 export class Post {
-  onlineDrive: DriveType | null;
+  onlineDrive: DriveType;
   constructor(
     public readonly url: string,
     public readonly author: string,
@@ -11,10 +11,10 @@ export class Post {
     this.onlineDrive = this.decideOnlineDrive(this.url);
   }
 
-  decideOnlineDrive(url: string): DriveType | null {
-    if (url.includes('google')) return DriveType.google;
-    if (url.includes('dropbox')) return DriveType.dropbox;
-    if (url.includes('mediafire')) return DriveType.mediafire;
-    return null;
+  decideOnlineDrive(url: string): DriveType {
+    if (url.includes('google')) return 'google';
+    if (url.includes('dropbox')) return 'dropbox';
+    if (url.includes('mediafire')) return 'mediafire';
+    return 'nothing';
   }
 }
