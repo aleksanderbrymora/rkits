@@ -3,6 +3,8 @@ import { download as dl } from 'wetransfert';
 import path from 'path';
 import { logger } from '../logger';
 import chalk from 'chalk';
+import unzip from 'extract-zip';
+import del from 'del';
 
 export class Wetransfer {
   constructor(private readonly post: Post) {}
@@ -13,11 +15,21 @@ export class Wetransfer {
       this.post.title,
     );
     try {
-      const pth = path.resolve(__dirname, 'kits');
-
-      await dl(this.post.url, pth);
+      const pth = path.resolve('kits');
+      console.log(`The path to the file is: ${pth}`);
+      const { content } = await dl(this.post.url, pth);
+      logger(`Downloaded ${content.items.join(', ')}, now extracting them`);
+      await Promise.all(
+        content.items.map(async (i) => {
+          const file = path.resolve('kits', i.name);
+          console.log(`Path to the file: ${file}`);
+          await unzip(file, { dir: pth });
+          return del(file);
+        }),
+      );
       logger('Downloaded:', this.post.title);
     } catch (error) {
+      console.log(error);
       console.log(chalk.red(`${this.post.title} has failed to download`));
       console.log(
         chalk.white(
