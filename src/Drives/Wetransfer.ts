@@ -11,25 +11,21 @@ export class Wetransfer {
 
   async download() {
     logger(
-      `Starting a download from ${this.post.onlineDrive} (url: ${this.post.url}) of`,
+      `Starting a download from ${this.post.onlineDrive} of`,
       this.post.title,
     );
     try {
       const pth = path.resolve('kits');
-      console.log(`The path to the file is: ${pth}`);
       const { content } = await dl(this.post.url, pth);
-      logger(`Downloaded ${content.items.join(', ')}, now extracting them`);
       await Promise.all(
         content.items.map(async (i) => {
           const file = path.resolve('kits', i.name);
-          console.log(`Path to the file: ${file}`);
           await unzip(file, { dir: pth });
           return del(file);
         }),
       );
       logger('Downloaded:', this.post.title);
     } catch (error) {
-      console.log(error);
       console.log(chalk.red(`${this.post.title} has failed to download`));
       console.log(
         chalk.white(

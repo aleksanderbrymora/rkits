@@ -8,7 +8,7 @@ import { logger } from './logger';
 import { Post } from './Post';
 import { Wetransfer } from './Drives/Wetransfer';
 
-const debug = true;
+const debug = false;
 
 const main = async (): Promise<void> => {
   const { data } = await axios.get('https://www.reddit.com/r/drumkits.json');
@@ -21,14 +21,7 @@ const main = async (): Promise<void> => {
       ('https://www.reddit.com' + data.permalink) as string,
     );
   });
-  logger(
-    'Got all the links',
-    JSON.stringify(
-      posts.map((p) => p.url),
-      null,
-      2,
-    ),
-  );
+  logger('Here are all the links', posts.map((p) => p.url).join(',\n'));
   await fetchFiles(posts);
 };
 
@@ -43,7 +36,7 @@ const downloadFromStorage = async (post: Post): Promise<void> => {
     case 'google':
       if (debug) break;
       logger(
-        'Google Drive currently unsupported cause their websites are cryptic as fuck.\nThis url has been ignored:',
+        'Google Drive currently unsupported cause their websites are cryptic as fuck.\nThis kit has been ignored:',
         post.title,
       );
       // const google = new Google(post);
@@ -80,7 +73,7 @@ const createKitsFolder = async () => {
 const fetchFiles = async (posts: Post[]): Promise<void> => {
   await createKitsFolder();
   logger(`Starting to download the files`);
-  await Pool.withConcurrency(2)
+  await Pool.withConcurrency(4)
     .for(posts)
     .process((p) => downloadFromStorage(p));
 
